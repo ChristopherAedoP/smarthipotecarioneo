@@ -43,7 +43,7 @@ namespace Neo.SmartContract
                     byte[] to = (byte[])args[1];      // Entidad 2
                    
 
-                    return Transfiere((from, to, args); //Traspaso el trabajo a otra entidad (Siguiente en el proceso hipotecario)
+                    return Transfiere(from, to, args); //Traspaso el trabajo a otra entidad (Siguiente en el proceso hipotecario)
                   }
                 if (operation == "EliminarSolProceso") 
                     byte[] Owner = Owner1
@@ -96,21 +96,24 @@ namespace Neo.SmartContract
 
              byte[] from_datos = Storage.Get(Storage.CurrentContext, from);
 
-              object[] datos = (object[])from_datos.Deserialize();
+             object[] datos = (object[])from_datos.Deserialize();
 
-            if (datos[0] != null) && (datos[1] == 3) // si idoperacion no es nulo y proceso = 3
+            if (datos[2] == 111) //  si todos los procesos estan ok para este owner entonces
             {
-                  args[2] = IdOperacion
-                  args[3] = 0  // Inicia con estado 0
-                  args[4] = date.now 
 
                 byte[] datos_storage = args.Serialize();
                 Storage.Put(Storage.CurrentContext, from, datos_storage);
 
+                  args[2] = IdOperacion
+                  args[3] = 000  // Inicia con estado 0
+                  args[4] = fechaaccion
+
+              
+
                 byte[] to_datos = Storage.Get(Storage.CurrentContext, to);
 
                 Storage.Put(Storage.CurrentContext, to, to_datos);
-                
+
                 Transferred(from, to, value);
             return true;
             }
