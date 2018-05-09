@@ -1,20 +1,14 @@
 using Neo.SmartContract.Framework;
 using Neo.SmartContract.Framework.Services.Neo;
-
+using System;
 namespace Neo.SmartContract
 {
-    public class dominio : Framework.SmartContract
+   public class Hipotecario : Framework.SmartContract
     {
-        
-        public static readonly byte[] Owner1 = "ATrzHaicmhRj15C3Vv6e6gLfLqhSD2PtTr".ToScriptHash(); //Banco
-        public static readonly byte[] Owner2 = "ksjsh3434GekkwHkewrjeDjjjhhhehe".ToScriptHash(); // Ejecutivo Hipotecario
-        public static readonly byte[] Owner3 = "LSDKF6KSDKJJJksjhsdfsshdggd".ToScriptHash();  // Notaria
-        public static readonly byte[] Owner4 = "ssfdfghhJHggfffdDDFHJJJHGFg".ToScriptHash(); // CBRS
-        public static readonly byte[] Owner5 = "2k2h2gksjhshgsgsgsggfffdfsss".ToScriptHash(); // INMOBILIARIA - FINALIZA SOLICITUD - FIN DEL PROCESO
-        
+    
 
-        [DisplayName("transfer")]
-        public static event Action<byte[], byte[], object[]> Transferred;
+        //[DisplayName("transfer")]
+        //public static event Action<byte[], byte[], object[]> Transferred;
 
         public static object Main(string operation, params object[] args)
         {
@@ -24,8 +18,8 @@ namespace Neo.SmartContract
                  if (operation == "ConsultarprocesoCredito") //Usuario consulta el proceso de su credito
                   {
                     if (args.Length != 1) return 0;
-                    String[] procesoHipo = (byte[])args[0];
-                    return Consulta(procesoHipo);
+                 
+                    return Consulta(args);
                   }
 
                  if (operation == "IngresarHipoInicial")  //Inicia la solicitud de Hipotecario (Banco)
@@ -45,17 +39,21 @@ namespace Neo.SmartContract
 
                     return Transfiere(from, to, args); //Traspaso el trabajo a otra entidad (Siguiente en el proceso hipotecario)
                   }
-                if (operation == "EliminarSolProceso") 
-                    byte[] Owner = Owner1
-                   return EliminarSolHipo(Owner);
+               // if (operation == "EliminarSolProceso") 
+                 //   byte[] Owner = Owner1
+                 //  return EliminarSolHipo(Owner);
              
              return false;
            }
+             return true;
         }
 
-        private static byte[] Consulta(byte[] address) // Consulto proceso de progreso (Entidad quien la tiene)
+        private static byte[] Consulta(object[] args) // Consulto proceso de progreso (Entidad quien la tiene)
         {
-             return Storage.Get(Storage.CurrentContext, address).AsInteger();
+            
+                  string proposal_id = (string)args[0];
+
+             return Storage.Get(Storage.CurrentContext, proposal_id);
         }
 
         private static bool IngresarHipoInicial(byte[] owner,object[] args)
@@ -72,7 +70,7 @@ namespace Neo.SmartContract
     
             object[] DatosHipo = new object[3];
             DatosHipo[0] = idOperacion;    
-            DatosHipo[1] = fechaAccion;        
+            DatosHipo[1] = fechaaccion;        
             DatosHipo[2] = proceso;      
 
             byte[] DatosHipo_storage = DatosHipo.Serialize();
@@ -98,15 +96,15 @@ namespace Neo.SmartContract
 
              object[] datos = (object[])from_datos.Deserialize();
 
-            if (datos[2] == 111) //  si todos los procesos estan ok para este owner entonces
+            if ((string)datos[2] == "111") //  si todos los procesos estan ok para este owner entonces
             {
 
                 byte[] datos_storage = args.Serialize();
                 Storage.Put(Storage.CurrentContext, from, datos_storage);
 
-                  args[2] = IdOperacion
-                  args[3] = 000  // Inicia con estado 0
-                  args[4] = fechaaccion
+                  args[2] = IdOperacion;
+                  args[3] = 000  ;// Inicia con estado 0
+                  args[4] = fechaaccion;
 
               
 
@@ -114,7 +112,7 @@ namespace Neo.SmartContract
 
                 Storage.Put(Storage.CurrentContext, to, to_datos);
 
-                Transferred(from, to, value);
+              // Transferred(from, to, value);
             return true;
             }
 
@@ -124,16 +122,16 @@ namespace Neo.SmartContract
 
            // }
 
-           // return true;
+            return true;
         }
 
-       private static bool EliminarSolHipo(byte[] Owner)
-        {
+     //  private static bool EliminarSolHipo(byte[] Owner)
+      //  {
    //       byte[] owner = Storage.Get(Storage.CurrentContext, dominio);
-          if (owner == null) return false;
-          if (!Runtime.CheckWitness(owner)) return false;
-          Storage.Delete(Storage.CurrentContext, Owner);
-          return true;
-        }
+      //    if (owner == null) return false;
+        //  if (!Runtime.CheckWitness(owner)) return false;
+       //   Storage.Delete(Storage.CurrentContext, Owner);
+      //    return true;
+        //}
     }
-}
+}  
