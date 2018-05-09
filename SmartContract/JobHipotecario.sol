@@ -14,32 +14,43 @@ namespace Neo.SmartContract
         
         public static object Main(string operation, params object[] args)
         {
-            switch (operation)
-            {
-                //Usuario consulta el estado de su credito
-                case "ConsultarEstadoCredito":
-
+          
+         if (Runtime.Trigger == TriggerType.Application)
+           {
+                 if (operation == "ConsultarEstadoCredito") //Usuario consulta el estado de su credito
+                  {
                     if (args.Length != 1) return 0;
-                    byte[] EstadoHipo = (byte[])args[0];
+                    String[] EstadoHipo = (byte[])args[0];
                     return Consulta(EstadoHipo);
-                //Inicia la solicitud de Hipotecario (Banco)
-                case "IngresarHipoInicial":
+                  }
 
-                    return IngresarHipoInicial((string)args[0], (byte[])args[1]); // Arg[0] = 
-              
-                //Traspaso el trabajo a otra entidad (Siguiente en el proceso hipotecario)
-                case "TraspasarSolProceso":
-                   if (args.Length != 3) return false;
+                 if (operation == "IngresarHipoInicial")  //Inicia la solicitud de Hipotecario (Banco)
+                  {
+                    if (args.Length != 4) return false;
+                    byte[] Owner = (byte[])args[0];    // Entidad 1
+                    int idOperacion = (int)args[1];    
+                    string estado = (string)args[2];
+                    string fechaaccion = (string)args[3];
+                    return IngresarHipoInicial(Owner, idOperacion, estado,fechaaccion); // 
+                  }
+             
+                if (operation == "TraspasarSolProceso")  //Inicia la solicitud de Hipotecario (Banco) Cambios de estado
+                  {
+                    if (args.Length != 5) return false;
                     byte[] from = (byte[])args[0];    // Entidad 1
                     byte[] to = (byte[])args[1];      // Entidad 2
-                    Integer IdOperacion = (Integer)args[2]; // Id de operacion 
+                    int IdOperacion = (int)args[2]; // Id de operacion 
+                    string estado = (string)args[3];
+                    string fechaaccion = (string)args[4];
 
-                    return Transfiere((from, to, IdOperacion); 
-                //case "Eliminar":
-                 //   return Delete((string)args[0]);
-                default:
-                    return false;
-            }
+                    return Transfiere((from, to, IdOperacion,estado,fechaaccion); //Traspaso el trabajo a otra entidad (Siguiente en el proceso hipotecario)
+                  }
+                if (operation == "EliminarSolProceso") 
+                    byte[] Owner = Owner1
+                   return EliminarSolHipo(Owner);
+             
+             return false;
+           }
         }
 
         private static byte[] Consulta(byte[] address) // Consulto estado de progreso (Entidad quien la tiene)
@@ -47,16 +58,23 @@ namespace Neo.SmartContract
              return Storage.Get(Storage.CurrentContext, address).AsInteger();
         }
 
-        private static bool IngresarHipoInicial(string dominio, byte[] owner)
+        private static bool IngresarHipoInicial(byte[] owner,int idOperacion, string estado, string fechaaccion)
         {
             if (!Runtime.CheckWitness(owner)) return false;
-            byte[] value = Storage.Get(Storage.CurrentContext, dominio);
-            if (value != null) return false;
-            Storage.Put(Storage.CurrentContext, owner ,dominio );
+
+                object[] DatosHipo = new object[4];
+                DatosHipo[0] = idOperacion;    
+                DatosHipo[1] = fechaAccion;        
+                DatosHipo[2] = estado;      
+
+            byte[] DatosHipo_storage = DatosHipo.Serialize();
+
+            Storage.Put(Storage.CurrentContext, owner, DatosHipo_storage);
+
             return true;
         }
 
-       private static bool Transfer(byte[] from, byte[] to, BigInteger value)
+       private static bool Transfiere(byte[] from, byte[] to, BigInteger value)
         {
             if (!Runtime.CheckWitness(to)) return false;
             byte[] from = Storage.Get(Storage.CurrentContext, dominio);
@@ -66,13 +84,13 @@ namespace Neo.SmartContract
             return true;
         }
 
-      // private static bool Delete(string dominio)
-      //    {
-      //      byte[] owner = Storage.Get(Storage.CurrentContext, dominio);
-      //    if (owner == null) return false;
-      //   if (!Runtime.CheckWitness(owner)) return false;
-      // Storage.Delete(Storage.CurrentContext, dominio);
-      //return true;
-      //}
+       private static bool EliminarSolHipo(byte[] Owner)
+        {
+   //       byte[] owner = Storage.Get(Storage.CurrentContext, dominio);
+          if (owner == null) return false;
+          if (!Runtime.CheckWitness(owner)) return false;
+          Storage.Delete(Storage.CurrentContext, Owner);
+          return true;
+        }
     }
 }
