@@ -99,18 +99,19 @@ namespace Neo.SmartContract
             if ((string)datos[2] == "111") //  si todos los procesos estan ok para este owner entonces
             {
 
-                byte[] datos_storage = args.Serialize();
-                Storage.Put(Storage.CurrentContext, from, datos_storage);
+                byte[] datos_storage_from = args.Serialize();
+                Storage.Put(Storage.CurrentContext, from, datos_storage_from);
 
                   args[2] = IdOperacion;
                   args[3] = 000  ;// Inicia con estado 0
                   args[4] = fechaaccion;
 
-              
+            
+               // byte[] to_datos = Storage.Get(Storage.CurrentContext, to);
 
-                byte[] to_datos = Storage.Get(Storage.CurrentContext, to);
+                byte[] datos_storage_to = args.Serialize();
 
-                Storage.Put(Storage.CurrentContext, to, to_datos);
+                Storage.Put(Storage.CurrentContext, to, datos_storage_to);
 
               // Transferred(from, to, value);
             return true;
