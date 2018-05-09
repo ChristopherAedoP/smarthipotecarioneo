@@ -13,8 +13,8 @@ namespace Neo.SmartContract
         public static readonly byte[] Owner5 = "2k2h2gksjhshgsgsgsggfffdfsss".ToScriptHash(); // INMOBILIARIA - FINALIZA SOLICITUD - FIN DEL PROCESO
         
 
-        [DisplayName("transfer")]
-        public static event Action<byte[], byte[], object[]> Transferred;
+        // [DisplayName("transfer")]
+        // public static event Action<byte[], byte[], object[]> Transferred;
 
         public static object Main(string operation, params object[] args)
         {
@@ -24,8 +24,8 @@ namespace Neo.SmartContract
                  if (operation == "ConsultarprocesoCredito") //Usuario consulta el proceso de su credito
                   {
                     if (args.Length != 1) return 0;
-                    String[] procesoHipo = (byte[])args[0];
-                    return Consulta(procesoHipo);
+                    // string[] procesoHipo = (byte[])args[0];
+                    return Consulta(args);
                   }
 
                  if (operation == "IngresarHipoInicial")  //Inicia la solicitud de Hipotecario (Banco)
@@ -45,17 +45,17 @@ namespace Neo.SmartContract
 
                     return Transfiere(from, to, args); //Traspaso el trabajo a otra entidad (Siguiente en el proceso hipotecario)
                   }
-                if (operation == "EliminarSolProceso") 
-                    byte[] Owner = Owner1
-                   return EliminarSolHipo(Owner);
+                // if (operation == "EliminarSolProceso") 
+                //     byte[] Owner = (byte[])args[0];  
+                //   return EliminarSolHipo(Owner);
              
              return false;
            }
         }
 
-        private static byte[] Consulta(byte[] address) // Consulto proceso de progreso (Entidad quien la tiene)
+        private static byte[] Consulta(object[] args) // Consulto proceso de progreso (Entidad quien la tiene)
         {
-             return Storage.Get(Storage.CurrentContext, address).AsInteger();
+             return Storage.Get(Storage.CurrentContext, (byte[])args[0]).AsInteger();
         }
 
         private static bool IngresarHipoInicial(byte[] owner,object[] args)
@@ -104,9 +104,9 @@ namespace Neo.SmartContract
                 byte[] datos_storage = args.Serialize();
                 Storage.Put(Storage.CurrentContext, from, datos_storage);
 
-                  args[2] = IdOperacion
-                  args[3] = 000  // Inicia con estado 0
-                  args[4] = fechaaccion
+                  args[2] = IdOperacion;
+                  args[3] = 000;  // Inicia con estado 0
+                  args[4] = fechaaccion;
 
               
 
@@ -114,7 +114,7 @@ namespace Neo.SmartContract
 
                 Storage.Put(Storage.CurrentContext, to, to_datos);
 
-                Transferred(from, to, value);
+                // Transferred(from, to, value);
             return true;
             }
 
